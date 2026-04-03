@@ -1,0 +1,169 @@
+<div>
+    <h2 style="margin-bottom: 2rem;">Welcome, {{profile.name}}</h2>
+    
+    <div class="dashboard-stats">
+        <div class="stat-card">
+            <h3 style="font-size: 1.5rem;">{{profile.department}}</h3>
+            <p>Department</p>
+        </div>
+        <div class="stat-card">
+            <h3 style="font-size: 1.5rem;">Year {{profile.year}}</h3>
+            <p>Current Year</p>
+        </div>
+        <div class="stat-card">
+            <h3 style="font-size: 1.5rem;">{{profile.hostel_id || 'Day Scholar'}}</h3>
+            <p>Hostel Info</p>
+        </div>
+    </div>
+
+    <!-- Academics Tab Navigation Simulator -->
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-bottom: 2rem;">
+        <div class="module-section" style="margin-bottom: 0;">
+            <h3>Attendance Record</h3>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Course</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="a in attendance" ng-style="{'background-color': a.status === 'Absent' ? 'rgba(198, 40, 40, 0.05)' : ''}">
+                            <td>{{a.date | date:'mediumDate'}}</td>
+                            <td>{{a.course_name}}</td>
+                            <td>
+                                <strong ng-style="{'color': a.status === 'Present' ? 'var(--success-color)' : 'var(--danger-color)'}">
+                                    {{a.status}}
+                                </strong>
+                            </td>
+                        </tr>
+                        <tr ng-if="attendance.length === 0">
+                            <td colspan="3">No attendance records found.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="module-section" style="margin-bottom: 0;">
+            <h3>Live Assignments</h3>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Course</th>
+                            <th>Assignment</th>
+                            <th>Due Date</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="asn in assignments">
+                            <td>{{asn.course_name}}</td>
+                            <td>{{asn.title}}</td>
+                            <td><strong style="color: var(--danger-color)">{{asn.due_date | date:'shortDate'}}</strong></td>
+                            <td>
+                                <button class="btn btn-small" ng-click="submitAssignmentFlow(asn)" style="font-size: 0.75rem; padding: 0.3rem 0.6rem;">Submit</button>
+                            </td>
+                        </tr>
+                        <tr ng-if="assignments.length === 0">
+                            <td colspan="4">No pending assignments!</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- Quick Assignment Submit Form Inline -->
+            <div ng-show="activeAssignment" style="margin-top: 1rem; padding: 1rem; background: #fff; border: 1px solid var(--primary-color); border-radius: 8px;">
+                <h4 style="margin-bottom: 0.5rem; color: var(--primary-color);">Submitting: {{activeAssignment.title}}</h4>
+                <form ng-submit="postAssignment()">
+                    <div class="form-group">
+                        <label>Submission Hub Link (GDrive/Github)</label>
+                        <input type="url" ng-model="submissionLink" required placeholder="https://...">
+                    </div>
+                    <button type="submit" class="btn btn-small">Turn In</button>
+                    <button type="button" class="btn btn-small" style="background:#6c757d; margin-left: 0.5rem;" ng-click="activeAssignment = null">Cancel</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Course Registration & Faculty Feedback -->
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-bottom: 2rem;">
+        <div class="module-section" style="margin-bottom: 0;">
+            <h3>Course Registration Request</h3>
+            <p style="font-size: 0.85rem; color: var(--text-light); margin-bottom: 1rem;">Enroll in new departmental electives.</p>
+            <form ng-submit="enrollCourse()">
+                <div class="form-group">
+                    <label>Select Course</label>
+                    <select ng-model="enrollment.course_id" required ng-options="c.course_id as (c.course_name + ' (Credits: ' + c.credits + ')') for c in availableCourses">
+                        <option value="">-- Choose Course --</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-small" style="background: var(--success-color);">Request Enrollment</button>
+            </form>
+        </div>
+
+        <div class="module-section" style="margin-bottom: 0;">
+            <h3>Faculty Feedback</h3>
+            <p style="font-size: 0.85rem; color: var(--text-light); margin-bottom: 1rem;">Anonymous AI-processed feedback.</p>
+            <form ng-submit="submitFeedback()">
+                <div class="form-group">
+                    <label>Select Faculty</label>
+                    <select ng-model="feedback.faculty_id" required ng-options="f.faculty_id as f.name for f in uniqueFacultyList">
+                        <option value="">-- Select Faculty --</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Rating (1-5)</label>
+                    <input type="number" min="1" max="5" ng-model="feedback.rating" required>
+                </div>
+                <div class="form-group">
+                    <label>Feedback Description</label>
+                    <textarea ng-model="feedback.text" rows="2" required></textarea>
+                </div>
+                <button type="submit" class="btn btn-small">Submit Feedback</button>
+            </form>
+        </div>
+    </div>
+
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-bottom: 2rem;">
+        <div class="module-section" style="margin-bottom: 0;">
+            <h3>Submit Complaint</h3>
+            <form ng-submit="submitComplaint()">
+                <div class="form-group">
+                    <label>Describe your issue</label>
+                    <textarea ng-model="complaintText" rows="4" required></textarea>
+                </div>
+                <button type="submit" class="btn btn-small btn-danger" ng-disabled="!complaintText">Log Issue Ticket</button>
+            </form>
+        </div>
+        
+        <div class="module-section" style="margin-bottom: 0;">
+            <h3>Marks & Grades Summary</h3>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Course</th>
+                            <th>Total</th>
+                            <th>Grade</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="m in marks">
+                            <td>{{m.course_name}}</td>
+                            <td>{{m.total_marks}}</td>
+                            <td><strong style="color: var(--primary-color)">{{m.grade}}</strong></td>
+                        </tr>
+                        <tr ng-if="marks.length === 0">
+                            <td colspan="3">No marks records found.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

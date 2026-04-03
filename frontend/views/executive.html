@@ -1,0 +1,74 @@
+<div>
+    <h2 style="margin-bottom: 2rem;">{{title}}</h2>
+    <p style="margin-bottom: 1rem;">Welcome to the high-level management dashboard for SVKM's NMIMS Shirpur Campus.</p>
+
+    <div class="dashboard-stats">
+        <div class="stat-card">
+            <h3>{{campusStats.students || 0}}</h3>
+            <p>Total Registered Students</p>
+        </div>
+        <div class="stat-card">
+            <h3>{{campusStats.faculty || 0}}</h3>
+            <p>Total Faculty Staff</p>
+        </div>
+        <div class="stat-card">
+            <h3>{{campusStats.courses || 0}}</h3>
+            <p>Campus Courses</p>
+        </div>
+        <div class="stat-card">
+            <h3 style="color: var(--danger-color);">{{campusStats.pending_complaints || 0}}</h3>
+            <p>Pending Student Complaints</p>
+        </div>
+    </div>
+
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-bottom: 2rem;">
+        <div class="module-section">
+            <h3>Department Overview</h3>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Department</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>MPSTME - Engineering</td>
+                            <td><strong style="color: var(--success-color)">Active</strong></td>
+                        </tr>
+                        <tr>
+                            <td>SPTM - Pharmacy</td>
+                            <td><strong style="color: var(--success-color)">Active</strong></td>
+                        </tr>
+                        <tr>
+                            <td>Textile Campus</td>
+                            <td><strong style="color: var(--success-color)">Active</strong></td>
+                        </tr>
+                        <tr>
+                            <td>Agri-Business</td>
+                            <td><strong style="color: var(--success-color)">Active</strong></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="module-section">
+            <h3>Recent Executive Notices</h3>
+            <div class="table-container" style="border: 1px solid #e9ecef; border-radius: 8px; padding: 1rem;">
+                <ul style="list-style: none;">
+                    <li style="padding: 10px 0; border-bottom: 1px solid #e9ecef;">
+                        <strong>Audit Review</strong> - Pharmacy Council of India inspection preparations.
+                    </li>
+                    <li style="padding: 10px 0; border-bottom: 1px solid #e9ecef;">
+                        <strong>Placements Taskforce</strong> - MPSTME recruitment drive starts in 2 weeks.
+                    </li>
+                    <li style="padding: 10px 0;">
+                        <strong>Hostel Advisory</strong> - Mandatory check of mess food quality.
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>

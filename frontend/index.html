@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="campusApp">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NMIMS Shirpur - Smart Campus Portal</title>
+    <!-- Use Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <!-- AngularJS -->
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular-route.js"></script>
+</head>
+<body ng-controller="MainController">
+
+    <!-- Header / Navbar -->
+    <header class="navbar" ng-show="isLoggedIn">
+        <div class="logo">NMIMS Shirpur Campus Portal</div>
+        <nav>
+            <ul>
+                <li ng-if="userRole === 'Admin'"><a href="#!/admin">Admin Dashboard</a></li>
+                <li ng-if="userRole === 'Student'"><a href="#!/student">Student Panel</a></li>
+                <li ng-if="userRole === 'Faculty'"><a href="#!/faculty">Faculty Panel</a></li>
+                <li ng-if="['HOD', 'Dean', 'Associate Dean', 'Director'].includes(userRole)"><a href="#!/executive">{{userRole}} Dashboard</a></li>
+                <li ng-if="userRole === 'Librarian'"><a href="#!/librarian">Library Panel</a></li>
+                <li><a href="#!" ng-click="logout()">Logout ({{userId}})</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="container">
+        <div ng-view></div>
+    </main>
+
+    <!-- Footer -->
+    <footer ng-show="isLoggedIn">
+        <p>&copy; 2026 SVKM's NMIMS Shirpur Campus. All Rights Reserved.</p>
+    </footer>
+
+    <!-- App Scripts -->
+    <script src="app.js"></script>
+</body>
+</html>
