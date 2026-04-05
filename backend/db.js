@@ -1,9 +1,10 @@
 const mysql = require('mysql2');
 
 const pool = mysql.createPool({
-    host: 'localhost',
+    host: '127.0.0.1',
+    port: 3308,
     user: 'root',
-    password: '', // Replace with actual root password if needed
+    password: '', 
     database: 'smart_campus_db',
     waitForConnections: true,
     connectionLimit: 10,
