@@ -68,15 +68,15 @@ CREATE TABLE Marks (
 );
 
 -- 7. Library Table
-CREATE TABLE Library (
-    book_id VARCHAR(20) PRIMARY KEY,
-    title VARCHAR(200) NOT NULL,
-    author VARCHAR(100),
-    student_id VARCHAR(20),
-    issue_date DATE,
-    return_date DATE,
-    status ENUM('Available', 'Issued') DEFAULT 'Available',
-    FOREIGN KEY (student_id) REFERENCES Students(student_id) ON DELETE SET NULL
+CREATE TABLE `Library` (
+    `book_id` VARCHAR(20) PRIMARY KEY,
+    `title` VARCHAR(200) NOT NULL,
+    `author` VARCHAR(100),
+    `student_id` VARCHAR(20),
+    `issue_date` DATE,
+    `return_date` DATE,
+    `status` ENUM('Available', 'Issued') DEFAULT 'Available',
+    FOREIGN KEY (`student_id`) REFERENCES `Students`(`student_id`) ON DELETE SET NULL
 );
 
 -- 8. Events Table
@@ -223,7 +223,8 @@ INSERT INTO Marks (student_id, course_id, internal_marks, external_marks, grade)
 ('S008', 'C008', 36, 54, 'A'),
 ('S010', 'C005', 29, 41, 'C');
 
-INSERT INTO Library (book_id, title, author, student_id, issue_date, return_date, status) VALUES
+INSERT INTO `Library` (book_id, title, author, student_id, issue_date, return_date, status) 
+VALUES
 ('B001', 'Database System Concepts', 'Silberschatz', 'S001', '2023-09-01', '2023-09-15', 'Available'),
 ('B002', 'Learning Web Design', 'Jennifer Robbins', 'S001', '2023-09-10', NULL, 'Issued'),
 ('B003', 'Electronic Devices', 'Thomas Floyd', 'S002', '2023-09-05', '2023-09-20', 'Available'),
@@ -301,3 +302,15 @@ INSERT INTO FacultyFeedback (feedback_id, student_id, faculty_id, feedback_text,
 (3, 'S003', 'F006', 'Physics classes are well structured.', 5),
 (4, 'S004', 'F001', 'Please slow down during SQL JOINs lectures.', 3);
 
+
+-- Run this query to see actual results from your database
+SELECT 
+    s.name,
+    s.department,
+    COUNT(DISTINCT c.complaint_id) AS pending_complaints,
+    COALESCE(ROUND(AVG(ff.rating), 1), 0) AS avg_rating
+FROM Students s
+LEFT JOIN Complaints c ON s.student_id = c.student_id AND c.status = 'Pending'
+LEFT JOIN FacultyFeedback ff ON s.student_id = ff.student_id
+GROUP BY s.student_id, s.name, s.department
+ORDER BY pending_complaints DESC;

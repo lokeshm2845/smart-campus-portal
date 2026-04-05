@@ -16,7 +16,12 @@ DROP TABLE TempTable;
 UPDATE Students SET address = 'Campus Hostel' WHERE hostel_id IS NOT NULL;
 
 -- 5. DML - DELETE
-DELETE FROM Events WHERE date < '2023-01-01';
+DELETE FROM Events 
+WHERE event_id IN (
+    SELECT event_id FROM (
+        SELECT event_id FROM Events WHERE date < '2023-01-01'
+    ) AS temp
+);
 
 -- 6. JOIN - INNER JOIN (Students and Hostel)
 SELECT s.name, s.department, h.hostel_name, h.room_number
@@ -100,3 +105,4 @@ INSERT INTO FeePayment (student_id, amount, payment_date, semester, payment_stat
 UPDATE Hostel SET fees_status = 'Paid' WHERE hostel_id = (SELECT hostel_id FROM Students WHERE student_id = 'S001');
 COMMIT;
 -- If error occurs, use ROLLBACK;
+

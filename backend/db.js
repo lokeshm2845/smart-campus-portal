@@ -1,14 +1,16 @@
-const mysql = require('mysql2');
+const mysql = require('mysql2/promise');
+const path = require('path');
+require('dotenv').config({ path: path.join(__dirname, '../.env') });
 
 const pool = mysql.createPool({
-    host: '127.0.0.1',
-    port: 3308,
-    user: 'root',
-    password: '', 
-    database: 'smart_campus_db',
+    host: process.env.DB_HOST,
+    user: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
+    database: process.env.DB_NAME,
+    port: process.env.DB_PORT || 3307,
     waitForConnections: true,
     connectionLimit: 10,
     queueLimit: 0
 });
 
-module.exports = pool.promise();
+module.exports = pool;
