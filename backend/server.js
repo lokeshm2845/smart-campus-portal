@@ -18,10 +18,11 @@ app.use(express.static(path.join(__dirname, '../frontend')));
 app.post('/api/login', async (req, res) => {
     try {
         const { user_id, password, role } = req.body;
-        const [users] = await db.execute(
-            'SELECT * FROM Users WHERE user_id = ? AND password_hash = ? AND role = ?',
+        const result = await db.query(
+            'SELECT * FROM users WHERE user_id = $1 AND password_hash = $2 AND role = $3',
             [user_id, password, role]
         );
+        const users = result.rows;
 
         if (users.length > 0) {
             res.json({ success: true, user: users[0] });
@@ -37,16 +38,16 @@ app.post('/api/login', async (req, res) => {
 // Admin - Manage Students (CRUD)
 app.get('/api/students', async (req, res) => {
     try {
-        const [rows] = await db.query('SELECT * FROM Students');
-        res.json(rows);
+        const result = await db.query('SELECT * FROM students');
+        res.json(result.rows);
     } catch (e) { res.status(500).json({error: e.message}); }
 });
 
 app.post('/api/students', async (req, res) => {
     try {
         const { student_id, name, email, phone, department, year, hostel_id } = req.body;
-        await db.execute(
-            'INSERT INTO Students (student_id, name, email, phone, department, year, hostel_id) VALUES (?, ?, ?, ?, ?, ?, ?)',
+        await db.query(
+            'INSERT INTO students (student_id, name, email, phone, department, year, hostel_id) VALUES ($1, $2, $3, $4, $5, $6, $7)',
             [student_id, name, email, phone, department, year, hostel_id]
         );
         res.json({ success: true, message: 'Student added' });
@@ -58,8 +59,8 @@ app.post('/api/students', async (req, res) => {
 app.put('/api/students/:id', async (req, res) => {
     try {
         const { name, email, phone, department, year, hostel_id } = req.body;
-        await db.execute(
-            'UPDATE Students SET name=?, email=?, phone=?, department=?, year=?, hostel_id=? WHERE student_id=?',
+        await db.query(
+            'UPDATE students SET name=$1, email=$2, phone=$3, department=$4, year=$5, hostel_id=$6 WHERE student_id=$7',
             [name, email, phone, department, year, hostel_id, req.params.id]
         );
         res.json({ success: true });
@@ -70,7 +71,7 @@ app.put('/api/students/:id', async (req, res) => {
 
 app.delete('/api/students/:id', async (req, res) => {
     try {
-        await db.execute('DELETE FROM Students WHERE student_id=?', [req.params.id]);
+        await db.query('DELETE FROM students WHERE student_id=$1', [req.params.id]);
         res.json({ success: true });
     } catch (error) {
         res.status(500).json({ error: error.message });
@@ -80,14 +81,14 @@ app.delete('/api/students/:id', async (req, res) => {
 // Admin - Complaints
 app.get('/api/complaints', async (req, res) => {
     try {
-        const [rows] = await db.query('SELECT c.*, s.name as student_name FROM Complaints c JOIN Students s ON c.student_id = s.student_id');
-        res.json(rows);
+        const result = await db.query('SELECT c.*, s.name as student_name FROM complaints c JOIN students s ON c.student_id = s.student_id');
+        res.json(result.rows);
     } catch (e) { res.status(500).json({error: e.message}); }
 });
 
 app.put('/api/complaints/:id/resolve', async (req, res) => {
     try {
-        await db.execute('UPDATE Complaints SET status="Resolved" WHERE complaint_id=?', [req.params.id]);
+        await db.query('UPDATE complaints SET status=$1 WHERE complaint_id=$2', ["Resolved", req.params.id]);
         res.json({ success: true });
     } catch (e) { res.status(500).json({error: e.message}); }
 });
@@ -95,43 +96,43 @@ app.put('/api/complaints/:id/resolve', async (req, res) => {
 // Student - Profile
 app.get('/api/student/:id', async (req, res) => {
     try {
-        const [rows] = await db.execute('SELECT * FROM Students WHERE student_id=?', [req.params.id]);
-        res.json(rows[0]);
+        const result = await db.query('SELECT * FROM students WHERE student_id=$1', [req.params.id]);
+        res.json(result.rows[0]);
     } catch (e) { res.status(500).json({error: e.message}); }
 });
 
 app.get('/api/student/:id/attendance', async (req, res) => {
     try {
-        const [rows] = await db.execute('SELECT a.*, c.course_name FROM Attendance a JOIN Courses c ON a.course_id = c.course_id WHERE a.student_id=?', [req.params.id]);
-        res.json(rows);
+        const result = await db.query('SELECT a.*, c.course_name FROM attendance a JOIN courses c ON a.course_id = c.course_id WHERE a.student_id=$1', [req.params.id]);
+        res.json(result.rows);
     } catch (e) { res.status(500).json({error: e.message}); }
 });
 
 app.get('/api/student/:id/marks', async (req, res) => {
     try {
-        const [rows] = await db.execute('SELECT m.*, c.course_name FROM Marks m JOIN Courses c ON m.course_id = c.course_id WHERE m.student_id=?', [req.params.id]);
-        res.json(rows);
+        const result = await db.query('SELECT m.*, c.course_name FROM marks m JOIN courses c ON m.course_id = c.course_id WHERE m.student_id=$1', [req.params.id]);
+        res.json(result.rows);
     } catch (e) { res.status(500).json({error: e.message}); }
 });
 
 app.get('/api/student/:id/library', async (req, res) => {
     try {
-        const [rows] = await db.execute('SELECT * FROM Library WHERE student_id=?', [req.params.id]);
-        res.json(rows);
+        const result = await db.query('SELECT * FROM library WHERE student_id=$1', [req.params.id]);
+        res.json(result.rows);
     } catch (e) { res.status(500).json({error: e.message}); }
 });
 
 app.get('/api/student/:id/fee', async (req, res) => {
     try {
-        const [rows] = await db.execute('SELECT * FROM FeePayment WHERE student_id=?', [req.params.id]);
-        res.json(rows);
+        const result = await db.query('SELECT * FROM fee_payment WHERE student_id=$1', [req.params.id]);
+        res.json(result.rows);
     } catch (e) { res.status(500).json({error: e.message}); }
 });
 
 app.post('/api/student/complaint', async (req, res) => {
     try {
         const { student_id, complaint_text } = req.body;
-        await db.execute('INSERT INTO Complaints (student_id, complaint_text, date_submitted) VALUES (?, ?, CURDATE())', [student_id, complaint_text]);
+        await db.query('INSERT INTO complaints (student_id, complaint_text, date_submitted) VALUES ($1, $2, CURRENT_DATE)', [student_id, complaint_text]);
         res.json({ success: true });
     } catch (e) { res.status(500).json({error: e.message}); }
 });
@@ -139,22 +140,22 @@ app.post('/api/student/complaint', async (req, res) => {
 // Student - Courses & Assignments
 app.get('/api/courses', async (req, res) => {
     try {
-        const [rows] = await db.query('SELECT c.*, f.name as faculty_name FROM Courses c LEFT JOIN Faculty f ON c.faculty_id = f.faculty_id');
-        res.json(rows);
+        const result = await db.query('SELECT c.*, f.name as faculty_name FROM courses c LEFT JOIN faculty f ON c.faculty_id = f.faculty_id');
+        res.json(result.rows);
     } catch (e) { res.status(500).json({error: e.message}); }
 });
 
 app.get('/api/student/:id/assignments', async (req, res) => {
     try {
-        const [rows] = await db.query('SELECT a.*, c.course_name FROM Assignments a JOIN Courses c ON a.course_id = c.course_id');
-        res.json(rows);
+        const result = await db.query('SELECT a.*, c.course_name FROM assignments a JOIN courses c ON a.course_id = c.course_id');
+        res.json(result.rows);
     } catch (e) { res.status(500).json({error: e.message}); }
 });
 
 app.post('/api/student/assignments/submit', async (req, res) => {
     try {
         const { assignment_id, student_id, submission_link } = req.body;
-        await db.execute('INSERT INTO AssignmentSubmissions (assignment_id, student_id, submission_link) VALUES (?, ?, ?)', [assignment_id, student_id, submission_link]);
+        await db.query('INSERT INTO assignment_submissions (assignment_id, student_id, submission_link) VALUES ($1, $2, $3)', [assignment_id, student_id, submission_link]);
         res.json({ success: true });
     } catch (e) { res.status(500).json({error: e.message}); }
 });
@@ -162,7 +163,7 @@ app.post('/api/student/assignments/submit', async (req, res) => {
 app.post('/api/student/feedback', async (req, res) => {
     try {
         const { student_id, faculty_id, feedback_text, rating } = req.body;
-        await db.execute('INSERT INTO FacultyFeedback (student_id, faculty_id, feedback_text, rating) VALUES (?, ?, ?, ?)', [student_id, faculty_id, feedback_text, rating]);
+        await db.query('INSERT INTO faculty_feedback (student_id, faculty_id, feedback_text, rating) VALUES ($1, $2, $3, $4)', [student_id, faculty_id, feedback_text, rating]);
         res.json({ success: true });
     } catch (e) { res.status(500).json({error: e.message}); }
 });
@@ -170,15 +171,15 @@ app.post('/api/student/feedback', async (req, res) => {
 // Faculty - Profile and functions
 app.get('/api/faculty/:id/courses', async (req, res) => {
     try {
-        const [rows] = await db.execute('SELECT * FROM Courses WHERE faculty_id=?', [req.params.id]);
-        res.json(rows);
+        const result = await db.query('SELECT * FROM courses WHERE faculty_id=$1', [req.params.id]);
+        res.json(result.rows);
     } catch (e) { res.status(500).json({error: e.message}); }
 });
 
 app.post('/api/faculty/attendance', async (req, res) => {
     try {
         const { student_id, course_id, status, semester } = req.body;
-        await db.execute('INSERT INTO Attendance (student_id, course_id, date, status, semester) VALUES (?, ?, CURDATE(), ?, ?)', [student_id, course_id, status, semester]);
+        await db.query('INSERT INTO attendance (student_id, course_id, date, status, semester) VALUES ($1, $2, CURRENT_DATE, $3, $4)', [student_id, course_id, status, semester]);
         res.json({ success: true });
     } catch (e) { res.status(500).json({error: e.message}); }
 });
@@ -186,7 +187,7 @@ app.post('/api/faculty/attendance', async (req, res) => {
 app.post('/api/faculty/marks', async (req, res) => {
     try {
         const { student_id, course_id, internal, external, grade } = req.body;
-        await db.execute('INSERT INTO Marks (student_id, course_id, internal_marks, external_marks, grade) VALUES (?, ?, ?, ?, ?)', [student_id, course_id, internal, external, grade]);
+        await db.query('INSERT INTO marks (student_id, course_id, internal_marks, external_marks, grade) VALUES ($1, $2, $3, $4, $5)', [student_id, course_id, internal, external, grade]);
         res.json({ success: true });
     } catch (e) { res.status(500).json({error: e.message}); }
 });
@@ -194,7 +195,7 @@ app.post('/api/faculty/marks', async (req, res) => {
 app.post('/api/faculty/assignments', async (req, res) => {
     try {
         const { course_id, title, description, due_date } = req.body;
-        await db.execute('INSERT INTO Assignments (course_id, title, description, due_date) VALUES (?, ?, ?, ?)', [course_id, title, description, due_date]);
+        await db.query('INSERT INTO assignments (course_id, title, description, due_date) VALUES ($1, $2, $3, $4)', [course_id, title, description, due_date]);
         res.json({ success: true });
     } catch (e) { res.status(500).json({error: e.message}); }
 });
@@ -202,15 +203,15 @@ app.post('/api/faculty/assignments', async (req, res) => {
 // Add generic stats for dashboard
 app.get('/api/stats', async (req, res) => {
     try {
-        const [students] = await db.query('SELECT COUNT(*) as c FROM Students');
-        const [faculty] = await db.query('SELECT COUNT(*) as c FROM Faculty');
-        const [courses] = await db.query('SELECT COUNT(*) as c FROM Courses');
-        const [complaints] = await db.query('SELECT COUNT(*) as c FROM Complaints WHERE status != "Resolved"');
+        const students = await db.query('SELECT COUNT(*) as c FROM students');
+        const faculty = await db.query('SELECT COUNT(*) as c FROM faculty');
+        const courses = await db.query('SELECT COUNT(*) as c FROM courses');
+        const complaints = await db.query('SELECT COUNT(*) as c FROM complaints WHERE status != $1', ["Resolved"]);
         res.json({
-            students: students[0].c,
-            faculty: faculty[0].c,
-            courses: courses[0].c,
-            pending_complaints: complaints[0].c
+            students: students.rows[0].c,
+            faculty: faculty.rows[0].c,
+            courses: courses.rows[0].c,
+            pending_complaints: complaints.rows[0].c
         });
     } catch (e) {
         res.status(500).json({error: e.message});
