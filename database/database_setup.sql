@@ -1,17 +1,17 @@
-CREATE DATABASE IF NOT EXISTS smart_campus_db;
-USE smart_campus_db;
+-- Create database (not needed in Supabase, as you work within a schema)
+-- Use the default schema "public"
 
 -- 1. Hostel Table
-CREATE TABLE Hostel (
+CREATE TABLE hostel (
     hostel_id VARCHAR(10) PRIMARY KEY,
     hostel_name VARCHAR(50) NOT NULL,
     room_number VARCHAR(10) NOT NULL,
-    fees_status ENUM('Paid', 'Pending') DEFAULT 'Pending',
+    fees_status TEXT DEFAULT 'Pending' CHECK (fees_status IN ('Paid', 'Pending')),
     UNIQUE (hostel_name, room_number)
 );
 
 -- 2. Students Table
-CREATE TABLE Students (
+CREATE TABLE students (
     student_id VARCHAR(20) PRIMARY KEY,
     name VARCHAR(100) NOT NULL,
     email VARCHAR(100) UNIQUE NOT NULL,
@@ -19,11 +19,11 @@ CREATE TABLE Students (
     department VARCHAR(50) NOT NULL,
     year INT CHECK (year >= 1 AND year <= 4),
     hostel_id VARCHAR(10),
-    FOREIGN KEY (hostel_id) REFERENCES Hostel(hostel_id) ON DELETE SET NULL
+    FOREIGN KEY (hostel_id) REFERENCES hostel(hostel_id) ON DELETE SET NULL
 );
 
 -- 3. Faculty Table
-CREATE TABLE Faculty (
+CREATE TABLE faculty (
     faculty_id VARCHAR(20) PRIMARY KEY,
     name VARCHAR(100) NOT NULL,
     email VARCHAR(100) UNIQUE NOT NULL,
@@ -33,125 +33,125 @@ CREATE TABLE Faculty (
 );
 
 -- 4. Courses Table
-CREATE TABLE Courses (
+CREATE TABLE courses (
     course_id VARCHAR(20) PRIMARY KEY,
     course_name VARCHAR(100) NOT NULL,
     credits INT CHECK (credits > 0),
     faculty_id VARCHAR(20),
     department VARCHAR(50),
-    FOREIGN KEY (faculty_id) REFERENCES Faculty(faculty_id) ON DELETE SET NULL
+    FOREIGN KEY (faculty_id) REFERENCES faculty(faculty_id) ON DELETE SET NULL
 );
 
 -- 5. Attendance Table
-CREATE TABLE Attendance (
-    attendance_id INT AUTO_INCREMENT PRIMARY KEY,
+CREATE TABLE attendance (
+    attendance_id SERIAL PRIMARY KEY,
     student_id VARCHAR(20),
     course_id VARCHAR(20),
     date DATE NOT NULL,
-    status ENUM('Present', 'Absent') NOT NULL,
+    status TEXT NOT NULL CHECK (status IN ('Present', 'Absent')),
     semester INT CHECK (semester >= 1 AND semester <= 8),
-    FOREIGN KEY (student_id) REFERENCES Students(student_id) ON DELETE CASCADE,
-    FOREIGN KEY (course_id) REFERENCES Courses(course_id) ON DELETE CASCADE
+    FOREIGN KEY (student_id) REFERENCES students(student_id) ON DELETE CASCADE,
+    FOREIGN KEY (course_id) REFERENCES courses(course_id) ON DELETE CASCADE
 );
 
 -- 6. Marks/Grades Table
-CREATE TABLE Marks (
-    mark_id INT AUTO_INCREMENT PRIMARY KEY,
+CREATE TABLE marks (
+    mark_id SERIAL PRIMARY KEY,
     student_id VARCHAR(20),
     course_id VARCHAR(20),
     internal_marks DECIMAL(5,2) DEFAULT 0.0 CHECK (internal_marks >= 0 AND internal_marks <= 40),
     external_marks DECIMAL(5,2) DEFAULT 0.0 CHECK (external_marks >= 0 AND external_marks <= 60),
     total_marks DECIMAL(5,2) GENERATED ALWAYS AS (internal_marks + external_marks) STORED,
     grade VARCHAR(2),
-    FOREIGN KEY (student_id) REFERENCES Students(student_id) ON DELETE CASCADE,
-    FOREIGN KEY (course_id) REFERENCES Courses(course_id) ON DELETE CASCADE
+    FOREIGN KEY (student_id) REFERENCES students(student_id) ON DELETE CASCADE,
+    FOREIGN KEY (course_id) REFERENCES courses(course_id) ON DELETE CASCADE
 );
 
--- 7. Library Table
-CREATE TABLE `Library` (
-    `book_id` VARCHAR(20) PRIMARY KEY,
-    `title` VARCHAR(200) NOT NULL,
-    `author` VARCHAR(100),
-    `student_id` VARCHAR(20),
-    `issue_date` DATE,
-    `return_date` DATE,
-    `status` ENUM('Available', 'Issued') DEFAULT 'Available',
-    FOREIGN KEY (`student_id`) REFERENCES `Students`(`student_id`) ON DELETE SET NULL
+-- 7. Library Table (renamed from "Library" to avoid reserved word)
+CREATE TABLE library (
+    book_id VARCHAR(20) PRIMARY KEY,
+    title VARCHAR(200) NOT NULL,
+    author VARCHAR(100),
+    student_id VARCHAR(20),
+    issue_date DATE,
+    return_date DATE,
+    status TEXT DEFAULT 'Available' CHECK (status IN ('Available', 'Issued')),
+    FOREIGN KEY (student_id) REFERENCES students(student_id) ON DELETE SET NULL
 );
 
 -- 8. Events Table
-CREATE TABLE Events (
+CREATE TABLE events (
     event_id VARCHAR(20) PRIMARY KEY,
     event_name VARCHAR(100) NOT NULL,
     date DATE NOT NULL,
     venue VARCHAR(100),
     description TEXT,
     organized_by VARCHAR(20),
-    FOREIGN KEY (organized_by) REFERENCES Faculty(faculty_id) ON DELETE SET NULL
+    FOREIGN KEY (organized_by) REFERENCES faculty(faculty_id) ON DELETE SET NULL
 );
 
 -- 9. Complaints Table
-CREATE TABLE Complaints (
-    complaint_id INT AUTO_INCREMENT PRIMARY KEY,
+CREATE TABLE complaints (
+    complaint_id SERIAL PRIMARY KEY,
     student_id VARCHAR(20),
     complaint_text TEXT NOT NULL,
-    status ENUM('Pending', 'In Progress', 'Resolved') DEFAULT 'Pending',
+    status TEXT DEFAULT 'Pending' CHECK (status IN ('Pending', 'In Progress', 'Resolved')),
     date_submitted DATE NOT NULL,
-    FOREIGN KEY (student_id) REFERENCES Students(student_id) ON DELETE CASCADE
+    FOREIGN KEY (student_id) REFERENCES students(student_id) ON DELETE CASCADE
 );
 
 -- 10. Fee Payment Table
-CREATE TABLE FeePayment (
-    payment_id INT AUTO_INCREMENT PRIMARY KEY,
+CREATE TABLE fee_payment (
+    payment_id SERIAL PRIMARY KEY,
     student_id VARCHAR(20),
     amount DECIMAL(10,2) NOT NULL CHECK (amount > 0),
     payment_date DATE NOT NULL,
     semester INT CHECK (semester >= 1 AND semester <= 8),
-    payment_status ENUM('Successful', 'Failed', 'Pending') DEFAULT 'Pending',
-    FOREIGN KEY (student_id) REFERENCES Students(student_id) ON DELETE CASCADE
+    payment_status TEXT DEFAULT 'Pending' CHECK (payment_status IN ('Successful', 'Failed', 'Pending')),
+    FOREIGN KEY (student_id) REFERENCES students(student_id) ON DELETE CASCADE
 );
 
 -- 11. Assignments Table
-CREATE TABLE Assignments (
-    assignment_id INT AUTO_INCREMENT PRIMARY KEY,
+CREATE TABLE assignments (
+    assignment_id SERIAL PRIMARY KEY,
     course_id VARCHAR(20),
     title VARCHAR(100),
     description TEXT,
     due_date DATE,
-    FOREIGN KEY (course_id) REFERENCES Courses(course_id) ON DELETE CASCADE
+    FOREIGN KEY (course_id) REFERENCES courses(course_id) ON DELETE CASCADE
 );
 
 -- 12. Assignment Submissions Table
-CREATE TABLE AssignmentSubmissions (
-    submission_id INT AUTO_INCREMENT PRIMARY KEY,
+CREATE TABLE assignment_submissions (
+    submission_id SERIAL PRIMARY KEY,
     assignment_id INT,
     student_id VARCHAR(20),
     submission_link VARCHAR(255),
     submitted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (assignment_id) REFERENCES Assignments(assignment_id) ON DELETE CASCADE,
-    FOREIGN KEY (student_id) REFERENCES Students(student_id) ON DELETE CASCADE
+    FOREIGN KEY (assignment_id) REFERENCES assignments(assignment_id) ON DELETE CASCADE,
+    FOREIGN KEY (student_id) REFERENCES students(student_id) ON DELETE CASCADE
 );
 
 -- 13. Faculty Feedback Table
-CREATE TABLE FacultyFeedback (
-    feedback_id INT AUTO_INCREMENT PRIMARY KEY,
+CREATE TABLE faculty_feedback (
+    feedback_id SERIAL PRIMARY KEY,
     student_id VARCHAR(20),
     faculty_id VARCHAR(20),
     feedback_text TEXT,
     rating INT CHECK (rating >= 1 AND rating <= 5),
-    FOREIGN KEY (student_id) REFERENCES Students(student_id) ON DELETE CASCADE,
-    FOREIGN KEY (faculty_id) REFERENCES Faculty(faculty_id) ON DELETE CASCADE
+    FOREIGN KEY (student_id) REFERENCES students(student_id) ON DELETE CASCADE,
+    FOREIGN KEY (faculty_id) REFERENCES faculty(faculty_id) ON DELETE CASCADE
 );
 
--- Users Table for Authentication (Added for web dev requirements)
-CREATE TABLE Users (
+-- Users Table for Authentication
+CREATE TABLE users (
     user_id VARCHAR(20) PRIMARY KEY,
     password_hash VARCHAR(255) NOT NULL,
-    role ENUM('Student', 'Faculty', 'Admin', 'HOD', 'Dean', 'Associate Dean', 'Director', 'Librarian') NOT NULL
+    role TEXT NOT NULL CHECK (role IN ('Student', 'Faculty', 'Admin', 'HOD', 'Dean', 'Associate Dean', 'Director', 'Librarian'))
 );
 
 -- Insert Sample Data
-INSERT INTO Hostel (hostel_id, hostel_name, room_number, fees_status) VALUES
+INSERT INTO hostel (hostel_id, hostel_name, room_number, fees_status) VALUES
 ('H01', 'Boys Hostel A', '101', 'Paid'),
 ('H02', 'Boys Hostel A', '102', 'Paid'),
 ('H03', 'Boys Hostel B', '101', 'Pending'),
@@ -163,7 +163,7 @@ INSERT INTO Hostel (hostel_id, hostel_name, room_number, fees_status) VALUES
 ('H09', 'Boys Hostel C', '301', 'Pending'),
 ('H10', 'Girls Hostel C', '301', 'Paid');
 
-INSERT INTO Students (student_id, name, email, phone, department, year, hostel_id) VALUES
+INSERT INTO students (student_id, name, email, phone, department, year, hostel_id) VALUES
 ('S001', 'John Doe', 'john@example.com', '9876543210', 'Computer Science', 3, 'H01'),
 ('S002', 'Jane Smith', 'jane@example.com', '9876543211', 'Electronics', 2, 'H05'),
 ('S003', 'Bob Johnson', 'bob@example.com', '9876543212', 'Mechanical', 4, 'H02'),
@@ -175,7 +175,7 @@ INSERT INTO Students (student_id, name, email, phone, department, year, hostel_i
 ('S009', 'Harry Wilson', 'harry@example.com', '9876543218', 'Mechanical', 1, 'H09'),
 ('S010', 'Ivy Moore', 'ivy@example.com', '9876543219', 'Civil', 2, 'H10');
 
-INSERT INTO Faculty (faculty_id, name, email, department, designation, phone) VALUES
+INSERT INTO faculty (faculty_id, name, email, department, designation, phone) VALUES
 ('F001', 'Dr. Alan Turing', 'alan@example.com', 'Computer Science', 'Professor', '8765432109'),
 ('F002', 'Dr. Marie Curie', 'marie@example.com', 'Physics', 'Associate Professor', '8765432108'),
 ('F003', 'Dr. Nikola Tesla', 'nikola@example.com', 'Electronics', 'Professor', '8765432107'),
@@ -187,7 +187,7 @@ INSERT INTO Faculty (faculty_id, name, email, department, designation, phone) VA
 ('F009', 'Dr. Blaise Pascal', 'blaise@example.com', 'Mathematics', 'Assistant Professor', '8765432101'),
 ('F010', 'Dr. CV Raman', 'raman@example.com', 'Physics', 'Professor', '8765432100');
 
-INSERT INTO Courses (course_id, course_name, credits, faculty_id, department) VALUES
+INSERT INTO courses (course_id, course_name, credits, faculty_id, department) VALUES
 ('C001', 'Database Management', 4, 'F001', 'Computer Science'),
 ('C002', 'Web Programming', 3, 'F004', 'Computer Science'),
 ('C003', 'Analog Electronics', 4, 'F003', 'Electronics'),
@@ -199,7 +199,7 @@ INSERT INTO Courses (course_id, course_name, credits, faculty_id, department) VA
 ('C009', 'Digital Logic', 3, 'F003', 'Electronics'),
 ('C010', 'Linear Algebra', 3, 'F009', 'Mathematics');
 
-INSERT INTO Attendance (student_id, course_id, date, status, semester) VALUES
+INSERT INTO attendance (student_id, course_id, date, status, semester) VALUES
 ('S001', 'C001', '2023-10-01', 'Present', 5),
 ('S002', 'C003', '2023-10-01', 'Absent', 3),
 ('S003', 'C007', '2023-10-01', 'Present', 7),
@@ -211,7 +211,7 @@ INSERT INTO Attendance (student_id, course_id, date, status, semester) VALUES
 ('S009', 'C007', '2023-10-01', 'Absent', 1),
 ('S010', 'C005', '2023-10-01', 'Present', 3);
 
-INSERT INTO Marks (student_id, course_id, internal_marks, external_marks, grade) VALUES
+INSERT INTO marks (student_id, course_id, internal_marks, external_marks, grade) VALUES
 ('S001', 'C001', 35, 55, 'A'),
 ('S001', 'C002', 30, 45, 'B'),
 ('S002', 'C003', 38, 58, 'O'),
@@ -223,7 +223,7 @@ INSERT INTO Marks (student_id, course_id, internal_marks, external_marks, grade)
 ('S008', 'C008', 36, 54, 'A'),
 ('S010', 'C005', 29, 41, 'C');
 
-INSERT INTO `Library` (book_id, title, author, student_id, issue_date, return_date, status) 
+INSERT INTO library (book_id, title, author, student_id, issue_date, return_date, status) 
 VALUES
 ('B001', 'Database System Concepts', 'Silberschatz', 'S001', '2023-09-01', '2023-09-15', 'Available'),
 ('B002', 'Learning Web Design', 'Jennifer Robbins', 'S001', '2023-09-10', NULL, 'Issued'),
@@ -236,7 +236,7 @@ VALUES
 ('B009', 'Clean Code', 'Robert Martin', 'S007', '2023-09-25', NULL, 'Issued'),
 ('B010', 'Advanced Engineering Maths', 'Erwin Kreyszig', 'S010', '2023-09-28', NULL, 'Issued');
 
-INSERT INTO Events (event_id, event_name, date, venue, description, organized_by) VALUES
+INSERT INTO events (event_id, event_name, date, venue, description, organized_by) VALUES
 ('E001', 'Tech Symposium 2023', '2023-11-15', 'Main Auditorium', 'Annual Tech Fest', 'F001'),
 ('E002', 'Science Fair', '2023-12-05', 'Science Block', 'Exhibition of projects', 'F002'),
 ('E003', 'Robotics Workshop', '2023-10-20', 'Lab 3', 'Hands-on robotics', 'F003'),
@@ -248,7 +248,7 @@ INSERT INTO Events (event_id, event_name, date, venue, description, organized_by
 ('E009', 'AI Workshop', '2023-11-20', 'Lab 1', 'Introduction to AI', 'F001'),
 ('E010', 'Cultural Meet', '2023-12-20', 'Open Air Theatre', 'Annual cultural festival', 'F010');
 
-INSERT INTO Complaints (student_id, complaint_text, status, date_submitted) VALUES
+INSERT INTO complaints (student_id, complaint_text, status, date_submitted) VALUES
 ('S001', 'Wi-Fi not working in Hostel A', 'In Progress', '2023-10-02'),
 ('S003', 'Water purifier filter needs replacement', 'Resolved', '2023-09-28'),
 ('S005', 'Library fine dispute', 'Pending', '2023-10-03'),
@@ -260,7 +260,7 @@ INSERT INTO Complaints (student_id, complaint_text, status, date_submitted) VALU
 ('S010', 'Parking space issue', 'Resolved', '2023-09-15'),
 ('S007', 'ID card lost, need replacement', 'In Progress', '2023-10-03');
 
-INSERT INTO FeePayment (student_id, amount, payment_date, semester, payment_status) VALUES
+INSERT INTO fee_payment (student_id, amount, payment_date, semester, payment_status) VALUES
 ('S001', 45000.00, '2023-07-15', 5, 'Successful'),
 ('S002', 45000.00, '2023-07-20', 3, 'Successful'),
 ('S003', 45000.00, '2023-07-18', 7, 'Pending'),
@@ -272,7 +272,7 @@ INSERT INTO FeePayment (student_id, amount, payment_date, semester, payment_stat
 ('S009', 50000.00, '2023-08-05', 1, 'Pending'),
 ('S010', 45000.00, '2023-07-10', 3, 'Successful');
 
-INSERT INTO Users (user_id, password_hash, role) VALUES
+INSERT INTO users (user_id, password_hash, role) VALUES
 ('S001', 'password123', 'Student'),
 ('S002', 'password123', 'Student'),
 ('F001', 'password123', 'Faculty'),
@@ -284,33 +284,32 @@ INSERT INTO Users (user_id, password_hash, role) VALUES
 ('LIB01', 'password123', 'Librarian'),
 ('admin', 'admin123', 'Admin');
 
-INSERT INTO Assignments (assignment_id, course_id, title, description, due_date) VALUES
+INSERT INTO assignments (assignment_id, course_id, title, description, due_date) VALUES
 (1, 'C001', 'Database Normalization Homework', 'Normalize the provided hospital database to 3NF', '2026-11-20'),
 (2, 'C001', 'SQL Complex Queries Project', 'Write 10 complex queries using JOINs and Subqueries', '2026-12-05'),
 (3, 'C002', 'Build a REST API', 'Use Node and Express to build a standard REST application', '2026-11-25'),
 (4, 'C002', 'AngularJS Single Page App', 'Create a routing system in AngularJS', '2026-12-10'),
 (5, 'C004', 'Quantum Physics Paper', '10 page analytical essay on Quantum entanglement', '2026-11-30');
 
-INSERT INTO AssignmentSubmissions (submission_id, assignment_id, student_id, submission_link, submitted_at) VALUES
+INSERT INTO assignment_submissions (submission_id, assignment_id, student_id, submission_link, submitted_at) VALUES
 (1, 1, 'S001', 'https://github.com/S001/dbms_hw1', '2026-11-18 10:23:00'),
 (2, 1, 'S002', 'https://github.com/S002/db_hw', '2026-11-19 14:10:00'),
 (3, 3, 'S001', 'https://github.com/S001/web_api', '2026-11-24 09:30:00');
 
-INSERT INTO FacultyFeedback (feedback_id, student_id, faculty_id, feedback_text, rating) VALUES
+INSERT INTO faculty_feedback (feedback_id, student_id, faculty_id, feedback_text, rating) VALUES
 (1, 'S001', 'F001', 'Great professor, makes database concepts very clear and answers queries well!', 5),
 (2, 'S002', 'F004', 'The web programming assignments are a bit tough but very practical.', 4),
 (3, 'S003', 'F006', 'Physics classes are well structured.', 5),
 (4, 'S004', 'F001', 'Please slow down during SQL JOINs lectures.', 3);
 
-
--- Run this query to see actual results from your database
+-- Final query: Students with pending complaints and average rating
 SELECT 
     s.name,
     s.department,
     COUNT(DISTINCT c.complaint_id) AS pending_complaints,
     COALESCE(ROUND(AVG(ff.rating), 1), 0) AS avg_rating
-FROM Students s
-LEFT JOIN Complaints c ON s.student_id = c.student_id AND c.status = 'Pending'
-LEFT JOIN FacultyFeedback ff ON s.student_id = ff.student_id
+FROM students s
+LEFT JOIN complaints c ON s.student_id = c.student_id AND c.status = 'Pending'
+LEFT JOIN faculty_feedback ff ON s.student_id = ff.student_id
 GROUP BY s.student_id, s.name, s.department
 ORDER BY pending_complaints DESC;

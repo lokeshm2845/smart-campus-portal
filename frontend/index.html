@@ -3,39 +3,49 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NMIMS Shirpur - Smart Campus Portal</title>
-    <!-- Use Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <title>SVKM's NMIMS | Smart Campus Portal</title>
+    
+    <!-- Icons and Fonts -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="stylesheet" href="style.css">
+    
     <!-- AngularJS -->
     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular-route.js"></script>
 </head>
-<body ng-controller="MainController">
+<body ng-controller="MainController" class="animate-fade">
 
     <!-- Header / Navbar -->
     <header class="navbar" ng-show="isLoggedIn">
-        <div class="logo">NMIMS Shirpur Campus Portal</div>
+        <div class="logo">
+            <i class="fa-solid fa-graduation-cap"></i>
+            <span>NMIMS Portal</span>
+        </div>
         <nav>
             <ul>
-                <li ng-if="userRole === 'Admin'"><a href="#!/admin">Admin Dashboard</a></li>
-                <li ng-if="userRole === 'Student'"><a href="#!/student">Student Panel</a></li>
-                <li ng-if="userRole === 'Faculty'"><a href="#!/faculty">Faculty Panel</a></li>
-                <li ng-if="['HOD', 'Dean', 'Associate Dean', 'Director'].includes(userRole)"><a href="#!/executive">{{userRole}} Dashboard</a></li>
-                <li ng-if="userRole === 'Librarian'"><a href="#!/librarian">Library Panel</a></li>
-                <li><a href="#!" ng-click="logout()">Logout ({{userId}})</a></li>
+                <li ng-if="userRole === 'Admin'"><a href="#!/admin"><i class="fa-solid fa-shield-halved"></i> Admin</a></li>
+                <li ng-if="userRole === 'Student'"><a href="#!/student"><i class="fa-solid fa-user-graduate"></i> Student</a></li>
+                <li ng-if="userRole === 'Faculty'"><a href="#!/faculty"><i class="fa-solid fa-chalkboard-user"></i> Faculty</a></li>
+                <li ng-if="['HOD', 'Dean', 'Associate Dean', 'Director'].includes(userRole)">
+                    <a href="#!/executive"><i class="fa-solid fa-user-tie"></i> {{userRole}}</a>
+                </li>
+                <li ng-if="userRole === 'Librarian'"><a href="#!/librarian"><i class="fa-solid fa-book"></i> Library</a></li>
+                <li><a href="#!" ng-click="logout()" class="btn-logout"><i class="fa-solid fa-power-off"></i></a></li>
             </ul>
         </nav>
+        <div class="user-meta">
+            <span class="user-id">ID: {{userId}}</span>
+        </div>
     </header>
 
     <!-- Main Content Area -->
     <main class="container">
-        <div ng-view></div>
+        <div ng-view class="animate-slide"></div>
     </main>
 
     <!-- Footer -->
     <footer ng-show="isLoggedIn">
-        <p>&copy; 2026 SVKM's NMIMS Shirpur Campus. All Rights Reserved.</p>
+        <p>&copy; 2026 SVKM's NMIMS Shirpur Campus. <span style="color: var(--primary-light);">Innovating Education.</span></p>
     </footer>
 
     <!-- App Scripts -->

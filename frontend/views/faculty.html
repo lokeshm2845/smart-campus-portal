@@ -1,73 +1,92 @@
-<div>
-    <h2 style="margin-bottom: 2rem;">Faculty Panel</h2>
+<div class="faculty-dashboard">
+    <div class="module-header">
+        <div class="module-title">
+            <i class="fa-solid fa-chalkboard-user"></i>
+            <h2>Faculty Academic Suite</h2>
+        </div>
+        <div class="badge badge-info">
+            <i class="fa-solid fa-user-check"></i> Educator Mode
+        </div>
+    </div>
 
+    <!-- Assigned Courses -->
     <div class="module-section">
-        <h3>Assigned Courses</h3>
+        <div class="module-title">
+            <i class="fa-solid fa-book"></i>
+            <h3>Current Curriculum Load</h3>
+        </div>
         <div class="table-container">
             <table>
                 <thead>
                     <tr>
-                        <th>Course ID</th>
-                        <th>Course Name</th>
-                        <th>Credits</th>
-                        <th>Department</th>
+                        <th>Module ID</th>
+                        <th>Course Title</th>
+                        <th>Credit Value</th>
+                        <th>Faculty Dept</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr ng-repeat="c in courses">
-                        <td>{{c.course_id}}</td>
-                        <td>{{c.course_name}}</td>
-                        <td>{{c.credits}}</td>
+                        <td><span class="badge" style="background: rgba(255,255,255,0.05);">{{c.course_id}}</span></td>
+                        <td style="font-weight: 700; color: var(--text-bright);">{{c.course_name}}</td>
+                        <td>{{c.credits}} Units</td>
                         <td>{{c.department}}</td>
-                    </tr>
-                    <tr ng-if="courses.length === 0">
-                        <td colspan="4">No assigned courses.</td>
                     </tr>
                 </tbody>
             </table>
         </div>
     </div>
 
-    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-bottom: 2rem;">
+        <!-- Attendance -->
         <div class="module-section">
-            <h3>Mark Attendance</h3>
+            <div class="module-title">
+                <i class="fa-solid fa-list-check"></i>
+                <h3>Rapid Attendance</h3>
+            </div>
             <form name="attendanceForm" ng-submit="markAttendance()" novalidate>
                 <div class="form-group">
-                    <label>Student ID</label>
-                    <input type="text" ng-model="attRecord.student_id" required>
+                    <label>Student University ID</label>
+                    <input type="text" ng-model="attRecord.student_id" placeholder="e.g. STU101" required>
                 </div>
                 <div class="form-group">
-                    <label>Course</label>
+                    <label>Active Module</label>
                     <select ng-model="attRecord.course_id" ng-options="c.course_id as (c.course_name + ' (' + c.course_id + ')') for c in courses" required>
-                        <option value="">Select Course</option>
+                        <option value="">-- Choose Module --</option>
                     </select>
                 </div>
                 <div class="form-group">
                     <label>Status</label>
                     <select ng-model="attRecord.status" required>
-                        <option value="">Select Status</option>
+                        <option value="">-- Choose Status --</option>
                         <option value="Present">Present</option>
                         <option value="Absent">Absent</option>
                     </select>
                 </div>
-                <button type="submit" class="btn btn-small" ng-disabled="attendanceForm.$invalid">Submit Attendance</button>
+                <button type="submit" class="btn btn-small" ng-disabled="attendanceForm.$invalid" style="width: 100%;">
+                    Upload Record
+                </button>
             </form>
         </div>
 
+        <!-- Marks Entry -->
         <div class="module-section">
-            <h3>Enter Marks</h3>
+            <div class="module-title">
+                <i class="fa-solid fa-award"></i>
+                <h3>Grading Console</h3>
+            </div>
             <form name="marksForm" ng-submit="enterMarks()" novalidate>
                 <div class="form-group">
-                    <label>Student ID</label>
+                    <label>Student University ID</label>
                     <input type="text" ng-model="markRecord.student_id" required>
                 </div>
                 <div class="form-group">
-                    <label>Course</label>
+                    <label>Module Selection</label>
                     <select ng-model="markRecord.course_id" ng-options="c.course_id as (c.course_name + ' (' + c.course_id + ')') for c in courses" required>
-                        <option value="">Select Course</option>
+                        <option value="">-- Choose Module --</option>
                     </select>
                 </div>
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem;">
                     <div class="form-group">
                         <label>Internal</label>
                         <input type="number" ng-model="markRecord.internal" max="40" required>
@@ -76,42 +95,53 @@
                         <label>External</label>
                         <input type="number" ng-model="markRecord.external" max="60" required>
                     </div>
+                    <div class="form-group">
+                        <label>Grade</label>
+                        <input type="text" ng-model="markRecord.grade" maxlength="2" placeholder="A+" required>
+                    </div>
                 </div>
-                <div class="form-group">
-                    <label>Grade</label>
-                    <input type="text" ng-model="markRecord.grade" required>
-                </div>
-                <button type="submit" class="btn btn-small" ng-disabled="marksForm.$invalid">Submit Marks</button>
+                <button type="submit" class="btn btn-small btn-outline" ng-disabled="marksForm.$invalid" style="width: 100%; border-color: var(--primary); color: white; background: var(--primary);">
+                    Publish Assessment
+                </button>
             </form>
         </div>
     </div>
 
-    <!-- Live Assignments Creation Module -->
-    <div class="module-section" style="margin-top: 2rem;">
-        <h3>Deploy New Assignment</h3>
-        <p style="font-size: 0.85rem; color: var(--text-light); margin-bottom: 1rem;">Push task requirements directly to student dashboards.</p>
+    <!-- Assignment Deployment -->
+    <div class="module-section">
+        <div class="module-header">
+            <div class="module-title">
+                <i class="fa-solid fa-cloud-arrow-up"></i>
+                <h3>New Assignment Deployment</h3>
+            </div>
+        </div>
+        <p style="font-size: 0.85rem; color: var(--text-dim); margin-bottom: 2rem;">Push new task requirements and deadlines directly to registered student panels.</p>
         <form name="assignmentForm" ng-submit="createAssignment()" novalidate>
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
                 <div class="form-group">
-                    <label>Course</label>
+                    <label>Target Module</label>
                     <select ng-model="newAssignment.course_id" ng-options="c.course_id as (c.course_name + ' (' + c.course_id + ')') for c in courses" required>
-                        <option value="">Select Course</option>
+                        <option value="">-- Select Target --</option>
                     </select>
                 </div>
                 <div class="form-group">
-                    <label>Title</label>
-                    <input type="text" ng-model="newAssignment.title" required>
+                    <label>Submission Title</label>
+                    <input type="text" ng-model="newAssignment.title" placeholder="e.g. Final Project Phase 1" required>
                 </div>
             </div>
             <div class="form-group">
-                <label>Description / Guidelines</label>
-                <textarea ng-model="newAssignment.description" rows="3" required></textarea>
+                <label>Technical Specifications / Brief</label>
+                <textarea ng-model="newAssignment.description" rows="4" placeholder="Outline the requirements, tools, and evaluation criteria..." required></textarea>
             </div>
-            <div class="form-group">
-                <label>Due Date</label>
-                <input type="date" ng-model="newAssignment.due_date" required>
+            <div style="display: flex; gap: 2rem; align-items: flex-end;">
+                <div class="form-group" style="flex: 1;">
+                    <label>Hard Submission Deadline</label>
+                    <input type="date" ng-model="newAssignment.due_date" required>
+                </div>
+                <button type="submit" class="btn" style="flex: 1; margin-bottom: 1.5rem;" ng-disabled="assignmentForm.$invalid">
+                    <i class="fa-solid fa-paper-plane"></i> Deploy Task to Class
+                </button>
             </div>
-            <button type="submit" class="btn btn-small" style="background: var(--primary-color)" ng-disabled="assignmentForm.$invalid">Deploy to Class</button>
         </form>
     </div>
 </div>

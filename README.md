@@ -1,35 +1,65 @@
 # NMIMS Shirpur - Smart Campus Management Portal
 
-A full-stack, enterprise-grade university management system built for NMIMS Shirpur campus. It supports intricate role-based authentications bridging students, faculty, and executive faculty (Deans, Directors, HODs) into one fluid real-time ecosystem.
+A full-stack university management system built for NMIMS Shirpur campus. It supports role-based authentication bridging students, faculty, and executive faculty (Deans, Directors, HODs) into one fluid real-time ecosystem.
 
 ## 🚀 Features
-- **Cinematic, Interactive UI:** Designed with premium glassmorphism overlays, deep-maroon NMIMS branding, fluid CSS animations, and highly responsive components using modern flexbox/grid environments.
-- **Multilevel Authentication Framework:** Secure login capabilities covering up to 8 different campus roles including Students, Admin, Deans, Librarians, and Department Directors.
-- **Live Student Module:** End-to-end capabilities allowing students to view real-time attendance, enroll in departmental electives, submit course assignments directly to the server, and provide 1-5 star anonymous feedback onto faculty ledgers.
-- **Faculty Broadcast Commands:** Professors can dynamically spin up new homework tasks or assignments, deploy them instantly to the designated class, and automatically enter student marks into the central database.
-- **Executive Operations Dashboard:** Top-level dashboard available only to Directors/Deans for cross-referencing campus-wide module statuses, tracking mass student population aggregates, and observing unresolved complaint streams.
-- **Strict Database Security Models:** Fully built around BCNF Normalization tracking highly integrated relational models involving composite keys and advanced schema architectures.
+- **Cinematic UI:** Premium glassmorphism, NMIMS branding, and fluid CSS animations.
+- **Multilevel Auth:** Secure login for 8 different campus roles including Students, Admin, and Deans.
+- **Live Modules:** Real-time attendance, elective enrollment, and faculty feedback.
+- **Executive Dashboard:** High-level overview for Directors/Deans to track campus aggregates.
 
 ## 🛠️ Technology Stack
-- **Frontend Container:** AngularJS (1.8.x), Modern HTML5 semantic structuring, Custom Vanilla CSS3 (variables, animations, glassmorphism)
-- **Backend Infrastructure:** Node.js, Express.js REST APIs
-- **Database Architecture:** MySQL 8+ handled via Node `mysql2` driver
+- **Frontend:** AngularJS (1.8.x), HTML5, Vanilla CSS3 (Variables, Flexbox, Grid).
+- **Backend:** Node.js, Express.js.
+- **Database:** PostgreSQL (Hosted on **Supabase**).
 
-## ⚙️ Running Locally (Development Mode)
+---
 
-1. **Database Initialization**
-    - Install and launch XAMPP (or equivalent database software).
-    - Open Apache and MySQL.
-    - Go to `http://localhost/phpmyadmin` and create a database named `smart_campus_db`.
-    - Import the file located in `database/database_setup.sql`.
+## ⚙️ Local Development Setup
 
-2. **Run Application**
-    - Open your terminal and change directory mapping to `/backend`.
-    - Ensure Node packages are installed: `npm install`
-    - Start up the live server environment: `npm start`
-    - Navigate browser to: `http://localhost:3000`
+1. **Clone the Project**
+   ```bash
+   git clone [your-repo-url]
+   cd smart-campus-portal
+   ```
 
-## ☁️ Deployment Notes for Vercel
-The repository includes a custom `vercel.json` and a modified `server.js` ensuring compatibility with Vercel's Serverless-Function hosting environments.
+2. **Configure Environment Variables**
+   Create a `.env` file in the root directory:
+   ```env
+   DATABASE_URL=your_supabase_connection_string
+   PORT=3000
+   ```
 
-**Note:** Since local XAMPP databases cannot be accessed by Vercel environments, a production cloud database (such as Aiven or Supabase Postgres migrations) **must be utilized** and credential swaps made inside `backend/db.js` before remote deployment capabilities are enabled.
+3. **Install Dependencies**
+   ```bash
+   cd backend
+   npm install
+   ```
+
+4. **Initialize Database**
+   Run the automated setup script to create tables and sample data on your Supabase instance:
+   ```bash
+   node setup-db.js
+   ```
+
+5. **Run the App**
+   ```bash
+   npm start
+   ```
+   Navigate to: `http://localhost:3000`
+
+---
+
+## ☁️ Deployment (Vercel)
+
+This project is optimized for Vercel Serverless Functions.
+
+1. **Push to GitHub**: Ensure your code is in a GitHub repository.
+2. **Import to Vercel**: Connect your repo to Vercel.
+3. **Set Environment Variables**:
+   In the Vercel dashboard (**Settings > Environment Variables**), you **MUST** add:
+   - `DATABASE_URL`: Your full Supabase connection string.
+4. **Deploy**: Vercel will build and host your project at a custom `.vercel.app` URL.
+
+> [!IMPORTANT]
+> Without the `DATABASE_URL` environment variable in Vercel, the app will throw an `ECONNREFUSED` error.

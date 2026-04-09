@@ -1,115 +1,149 @@
-<div>
-    <h2 style="margin-bottom: 2rem;">Admin Dashboard</h2>
+<div class="admin-dashboard">
+    <div class="module-header">
+        <div class="module-title">
+            <i class="fa-solid fa-gauge-high"></i>
+            <h2>Administrative Control Center</h2>
+        </div>
+        <div class="badge badge-warning">
+            <i class="fa-solid fa-shield-halved"></i> Global Access
+        </div>
+    </div>
 
     <div class="dashboard-stats">
         <div class="stat-card">
-            <h3>{{stats.students || 0}}</h3>
+            <div class="icon"><i class="fa-solid fa-users"></i></div>
             <p>Total Students</p>
+            <h3>{{stats.students || 0}}</h3>
         </div>
         <div class="stat-card">
-            <h3>{{stats.faculty || 0}}</h3>
+            <div class="icon"><i class="fa-solid fa-user-tie"></i></div>
             <p>Total Faculty</p>
+            <h3>{{stats.faculty || 0}}</h3>
         </div>
         <div class="stat-card">
-            <h3>{{stats.courses || 0}}</h3>
+            <div class="icon"><i class="fa-solid fa-book-open"></i></div>
             <p>Total Courses</p>
+            <h3>{{stats.courses || 0}}</h3>
         </div>
-        <div class="stat-card">
-            <h3>{{stats.pending_complaints || 0}}</h3>
-            <p>Pending Complaints</p>
-        </div>
-    </div>
-
-    <div class="module-section">
-        <h3>Add New Student</h3>
-        <form name="studentForm" ng-submit="addStudent()" novalidate>
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
-                <div class="form-group">
-                    <label>Student ID</label>
-                    <input type="text" ng-model="newStudent.student_id" required>
-                </div>
-                <div class="form-group">
-                    <label>Name</label>
-                    <input type="text" ng-model="newStudent.name" required>
-                </div>
-                <div class="form-group">
-                    <label>Email</label>
-                    <input type="email" ng-model="newStudent.email" required>
-                </div>
-                <div class="form-group">
-                    <label>Phone</label>
-                    <input type="text" ng-model="newStudent.phone" required>
-                </div>
-                <div class="form-group">
-                    <label>Department</label>
-                    <input type="text" ng-model="newStudent.department" required>
-                </div>
-                <div class="form-group">
-                    <label>Year</label>
-                    <input type="number" min="1" max="4" ng-model="newStudent.year" required>
-                </div>
-                <div class="form-group">
-                    <label>Hostel ID</label>
-                    <input type="text" ng-model="newStudent.hostel_id">
-                </div>
+        <div class="stat-card" style="border-color: var(--danger);">
+            <div class="icon" style="color: var(--danger); background: rgba(239, 68, 68, 0.1);">
+                <i class="fa-solid fa-circle-exclamation"></i>
             </div>
-            <button type="submit" class="btn btn-small" ng-disabled="studentForm.$invalid">Add Student</button>
-        </form>
-    </div>
-
-    <div class="module-section">
-        <h3>Manage Students</h3>
-        <div class="table-container">
-            <table>
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Name</th>
-                        <th>Department</th>
-                        <th>Year</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr ng-repeat="s in students">
-                        <td>{{s.student_id}}</td>
-                        <td>{{s.name}}</td>
-                        <td>{{s.department}}</td>
-                        <td>{{s.year}}</td>
-                        <td>
-                            <button class="btn btn-small btn-danger" ng-click="deleteStudent(s.student_id)">Delete</button>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
+            <p>Pending Issues</p>
+            <h3>{{stats.pending_complaints || 0}}</h3>
         </div>
     </div>
 
+    <!-- Student Management -->
+    <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 2rem; margin-bottom: 2rem;">
+        <div class="module-section">
+            <div class="module-title">
+                <i class="fa-solid fa-user-plus"></i>
+                <h3>Register Student</h3>
+            </div>
+            <form name="studentForm" ng-submit="addStudent()" novalidate>
+                <div class="form-group">
+                    <label>ID Profile</label>
+                    <input type="text" ng-model="newStudent.student_id" placeholder="e.g. STU101" required>
+                </div>
+                <div class="form-group">
+                    <label>Full Name</label>
+                    <input type="text" ng-model="newStudent.name" placeholder="John Doe" required>
+                </div>
+                <div class="form-group">
+                    <label>Official Email</label>
+                    <input type="email" ng-model="newStudent.email" placeholder="john@nmims.edu" required>
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                    <div class="form-group">
+                        <label>Dept</label>
+                        <input type="text" ng-model="newStudent.department" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Year</label>
+                        <input type="number" min="1" max="4" ng-model="newStudent.year" required>
+                    </div>
+                </div>
+                <button type="submit" class="btn" ng-disabled="studentForm.$invalid" style="width: 100%;">
+                    Finalize Registration
+                </button>
+            </form>
+        </div>
+
+        <div class="module-section">
+            <div class="module-title">
+                <i class="fa-solid fa-users-gear"></i>
+                <h3>Student Registry</h3>
+            </div>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Identity</th>
+                            <th>Department</th>
+                            <th>Level</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="s in students">
+                            <td>
+                                <div style="font-weight: 700; color: var(--text-bright);">{{s.name}}</div>
+                                <div style="font-size: 0.75rem; color: var(--text-dim);">#{{s.student_id}}</div>
+                            </td>
+                            <td>{{s.department}}</td>
+                            <td>
+                                <span class="badge badge-success" style="background: rgba(255,255,255,0.05);">Year {{s.year}}</span>
+                            </td>
+                            <td>
+                                <button class="btn btn-small btn-outline" style="color: var(--danger); border-color: var(--danger);" ng-click="deleteStudent(s.student_id)">
+                                    <i class="fa-solid fa-trash-can"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Issues Management -->
     <div class="module-section">
-        <h3>Complaints Management</h3>
+        <div class="module-title">
+            <i class="fa-solid fa-headset"></i>
+            <h3>Administrative Ticketing System</h3>
+        </div>
         <div class="table-container">
             <table>
                 <thead>
                     <tr>
-                        <th>Date</th>
-                        <th>Student</th>
-                        <th>Complaint</th>
-                        <th>Status</th>
-                        <th>Action</th>
+                        <th>Timeline</th>
+                        <th>Origin</th>
+                        <th>Issue Description</th>
+                        <th>Priority</th>
+                        <th>Action center</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr ng-repeat="c in complaints">
                         <td>{{c.date_submitted | date:'mediumDate'}}</td>
-                        <td>{{c.student_name}} ({{c.student_id}})</td>
-                        <td>{{c.complaint_text}}</td>
                         <td>
-                            <span ng-style="{'color': c.status === 'Resolved' ? 'var(--success-color)' : 'var(--danger-color)'}">
+                            <div style="font-weight: 600;">{{c.student_name}}</div>
+                            <small>{{c.student_id}}</small>
+                        </td>
+                        <td style="max-width: 300px; font-size: 0.85rem; color: var(--text-dim);">{{c.complaint_text}}</td>
+                        <td>
+                            <span class="badge" ng-class="c.status === 'Resolved' ? 'badge-success' : 'badge-danger'">
                                 {{c.status}}
                             </span>
                         </td>
                         <td>
-                            <button class="btn btn-small" ng-if="c.status !== 'Resolved'" ng-click="resolveComplaint(c.complaint_id)">Mark Resolved</button>
+                            <button class="btn btn-small" ng-if="c.status !== 'Resolved'" ng-click="resolveComplaint(c.complaint_id)">
+                                <i class="fa-solid fa-check-double"></i> Resolve
+                            </button>
+                            <span ng-if="c.status === 'Resolved'" style="color: var(--success); font-weight: 700;">
+                                <i class="fa-solid fa-circle-check"></i> Handled
+                            </span>
                         </td>
                     </tr>
                 </tbody>

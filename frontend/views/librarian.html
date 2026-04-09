@@ -1,15 +1,30 @@
-<div>
-    <h2 style="margin-bottom: 2rem;">{{title}}</h2>
+<div class="librarian-dashboard">
+    <div class="module-header">
+        <div class="module-title">
+            <i class="fa-solid fa-book-bookmark"></i>
+            <h2>{{title || 'NMIMS Central Library'}}</h2>
+        </div>
+        <div class="badge badge-warning">
+            <i class="fa-solid fa-screwdriver-wrench"></i> Setup Pending
+        </div>
+    </div>
     
     <div class="dashboard-stats">
         <div class="stat-card">
-            <h3>Library Module</h3>
-            <p>Under maintenance configuration</p>
+            <div class="icon"><i class="fa-solid fa-microchip"></i></div>
+            <p>System Status</p>
+            <h3>Modernization</h3>
         </div>
     </div>
 
-    <div class="module-section">
-        <h3>Library Management coming soon</h3>
-        <p>This module is actively being developed to handle all library requests, book tracking, and penalty fees for the NMIMS central library.</p>
+    <div class="glass-card animate-slide" style="text-align: center; padding: 4rem;">
+        <div style="font-size: 4rem; color: var(--primary); margin-bottom: 1.5rem;">
+            <i class="fa-solid fa-hourglass-half fa-spin"></i>
+        </div>
+        <h3 style="color: var(--text-bright); margin-bottom: 1rem;">Central Library Module Under Maintenance</h3>
+        <p style="color: var(--text-dim); max-width: 600px; margin: 0 auto;">
+            The central library digital ledger is currently undergoing a scheduled upgrade to integrate next-gen book tracking, penalty automation, and RFID systems.
+        </p>
+        <button class="btn btn-small btn-outline" style="margin-top: 2rem; width: auto;">Notify IT Team</button>
     </div>
 </div>
